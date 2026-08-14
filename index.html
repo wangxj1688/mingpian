@@ -119,6 +119,16 @@
     font-size:11.5px;color:rgba(255,255,255,.75);
     max-width:380px;
   }
+  .qr-block{
+    margin-top:22px;text-align:center;
+    background:#f7f8fc;border-radius:16px;padding:18px 16px 16px;
+  }
+  .qr-block img{
+    width:168px;height:168px;border-radius:12px;background:#fff;
+    padding:8px;box-shadow:0 6px 16px rgba(20,20,60,.12);
+  }
+  .qr-cap{font-size:15px;font-weight:700;margin-top:12px;color:var(--ink);}
+  .qr-sub{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.6;}
   .toast{
     position:fixed;left:50%;bottom:48px;transform:translateX(-50%) translateY(20px);
     background:rgba(20,20,30,.92);color:#fff;
@@ -150,6 +160,11 @@
         一键加到通讯录
       </button>
       <button class="btn btn-ghost" id="copyWxBtn">复制微信号</button>
+    </div>
+    <div class="qr-block">
+      <img src="card.png" alt="扫码保存到通讯录">
+      <div class="qr-cap">📷 扫码直接保存到通讯录</div>
+      <div class="qr-sub">手机相机对准二维码 → 自动识别 → 一键添加联系人<br>（无需下载文件、无需切换浏览器，最省事）</div>
     </div>
   </div>
 </div>
