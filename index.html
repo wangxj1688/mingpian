@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>个人名片</title>
+<style>
+  :root{
+    --primary:#4f6ef7;
+    --primary-2:#7b5cff;
+    --ink:#1f2330;
+    --sub:#6b7280;
+    --line:#eef0f4;
+    --bg-1:#5b6cff;
+    --bg-2:#8a5cff;
+    --wechat:#07c160;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:linear-gradient(135deg,var(--bg-1) 0%,var(--bg-2) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 36px;
+  }
+  .wx-tip{
+    display:none;
+    width:100%;max-width:380px;
+    background:rgba(255,255,255,.95);
+    color:#b45309;
+    font-size:13px;line-height:1.5;
+    border-radius:14px;
+    padding:12px 14px;
+    margin-bottom:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+  }
+  .wx-tip b{color:#92400e;}
+  .card{
+    width:100%;max-width:380px;
+    background:#fff;
+    border-radius:26px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(20,20,60,.28);
+    position:relative;
+  }
+  .card-header{
+    background:linear-gradient(135deg,var(--bg-1),var(--bg-2));
+    padding:38px 24px 64px;
+    text-align:center;
+    position:relative;
+  }
+  .avatar{
+    width:96px;height:96px;border-radius:50%;
+    margin:0 auto;
+    border:4px solid #fff;
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    font-size:38px;font-weight:700;color:var(--primary);
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .name{color:#fff;font-size:24px;font-weight:700;margin-top:14px;letter-spacing:1px;}
+  .title{color:rgba(255,255,255,.9);font-size:14px;margin-top:6px;}
+  .card-body{padding:24px 22px 26px;margin-top:-40px;position:relative;}
+  .bio{
+    background:#f7f8fc;
+    border-radius:16px;
+    padding:14px 16px;
+    font-size:13.5px;color:var(--sub);line-height:1.6;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .row{
+    display:flex;align-items:center;
+    padding:13px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    text-decoration:none;color:inherit;
+  }
+  .row:last-child{border-bottom:none;}
+  .row .ic{
+    width:34px;height:34px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    margin-right:13px;flex-shrink:0;
+    background:#eef1ff;color:var(--primary);
+  }
+  .row .ic svg{width:18px;height:18px;}
+  .row .meta{flex:1;min-width:0;}
+  .row .label{font-size:11.5px;color:var(--sub);}
+  .row .val{font-size:15px;font-weight:600;margin-top:2px;word-break:break-all;}
+  .row .chev{color:#c7ccd6;font-size:18px;margin-left:8px;}
+  .actions{margin-top:22px;display:flex;flex-direction:column;gap:12px;}
+  .btn{
+    border:none;border-radius:14px;
+    padding:15px;font-size:16px;font-weight:700;
+    cursor:pointer;width:100%;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:transform .08s ease,opacity .2s;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    color:#fff;
+    box-shadow:0 10px 22px rgba(91,108,255,.4);
+  }
+  .btn-ghost{
+    background:#f1f3f9;color:var(--ink);
+  }
+  .btn svg{width:20px;height:20px;}
+  .footer{
+    margin-top:18px;text-align:center;
+    font-size:11.5px;color:rgba(255,255,255,.75);
+    max-width:380px;
+  }
+  .toast{
+    position:fixed;left:50%;bottom:48px;transform:translateX(-50%) translateY(20px);
+    background:rgba(20,20,30,.92);color:#fff;
+    padding:11px 20px;border-radius:30px;font-size:14px;
+    opacity:0;pointer-events:none;transition:all .25s;z-index:99;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="wx-tip" id="wxTip">
+  💡 当前在微信中打开，<b>点击右上角 ⋯ → 选择「在浏览器打开」</b>，再点「一键加到通讯录」即可保存我的联系方式。
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="avatar" id="avatar"></div>
+    <div class="name" id="name"></div>
+    <div class="title" id="title"></div>
+  </div>
+  <div class="card-body">
+    <div class="bio" id="bio"></div>
+    <div id="rows"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="saveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        一键加到通讯录
+      </button>
+      <button class="btn btn-ghost" id="copyWxBtn">复制微信号</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">长按页面可保存图片 · 转发给朋友即可分享我的名片</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   ★ 只需修改下面这个 CARD 配置即可，其余不用动 ★
+   把占位内容换成你自己的真实信息即可。
+   ========================================================= */
+const CARD = {
+  name: "王小建",                 // 显示姓名
+  familyName: "王",              // 姓（vCard 用）
+  givenName: "小建",             // 名（vCard 用）
+  title: "工信部领航导师 / 阿里系认证讲师 / 多所高校特聘导师",
+  bio: "AI智能体开发与应用专家、AI Agent智能体热销书作者、15年深度服务企业数字化与商业变革实践经验，专研传统企业转型电商运营、品牌打造、新零售商业管理、AI时代转型升级、AI新工具提效、AI组织转型升级等。",
+  photo: "",                     // 头像图片链接，留空则用姓名首字；可填 http(s) 图片地址
+  org: "云启科技",               // 公司/组织
+  wechat: "t13960435",           // 微信号
+  phones: ["15961000288","18014526288"], // 手机号（可填多个）
+  email: "13960435@qq.com",      // 邮箱
+  address: "浙江省杭州市",        // 地址
+  website: ""                    // 个人网站/主页，可留空
+};
+
+/* ---------- 以下为页面逻辑，一般无需改动 ---------- */
+(function(){
+  const $ = id => document.getElementById(id);
+
+  // 微信环境检测
+  if(/MicroMessenger/i.test(navigator.userAgent)){ $("wxTip").style.display="block"; }
+
+  // 头像
+  const av = $("avatar");
+  if(CARD.photo){ av.innerHTML = `<img src="${CARD.photo}" alt="">`; }
+  else { av.textContent = CARD.name.charAt(0); }
+
+  $("name").textContent = CARD.name;
+  $("title").textContent = CARD.title;
+  $("bio").textContent = CARD.bio;
+
+  // 联系方式行
+  const icons = {
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    wechat:'<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+    email:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+    org:'<path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>',
+    address:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+    website:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
+  };
+  function row(ic,label,val,href,showChev){
+    return `<a class="row" ${href?`href="${href}"`:''} ${href&&href.startsWith('tel')||href&&href.startsWith('mailto')?'':'onclick="return false;"'}>
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[ic]}</svg></span>
+      <span class="meta"><span class="label">${label}</span><span class="val">${val}</span></span>
+      ${showChev?'<span class="chev">›</span>':''}
+    </a>`;
+  }
+  let rowsHtml = "";
+  const phones = (CARD.phones && CARD.phones.length) ? CARD.phones : (CARD.phone ? [CARD.phone] : []);
+  phones.forEach((p,i)=>{
+    const label = phones.length>1 ? ("电话"+(i+1)) : "电话";
+    rowsHtml += row("phone",label,p,`tel:${p}`,true);
+  });
+  if(CARD.wechat)  rowsHtml += row("wechat","微信",CARD.wechat,"",true);
+  if(CARD.email)   rowsHtml += row("email","邮箱",CARD.email,`mailto:${CARD.email}`,true);
+  if(CARD.org)     rowsHtml += row("org","公司/组织",CARD.org,"",false);
+  if(CARD.address) rowsHtml += row("address","地址",CARD.address,"",false);
+  if(CARD.website) rowsHtml += row("website","主页",CARD.website,CARD.website,true);
+  $("rows").innerHTML = rowsHtml;
+
+  // 微信行点击复制
+  document.querySelectorAll('.row').forEach(r=>{
+    const label = r.querySelector('.label')?.textContent;
+    if(label==="微信"){
+      r.addEventListener('click',()=>copyText(CARD.wechat,"微信号已复制"));
+    }
+  });
+
+  // 生成 vCard
+  function buildVCard(){
+    const d = CARD;
+    const L = [
+      "BEGIN:VCARD","VERSION:3.0",
+      `N:${d.familyName};${d.givenName};;;`,
+      `FN:${d.name}`,
+      `ORG:${d.org}`,
+      `TITLE:${d.title}`,
+      ...(phones.length?phones.map(p=>`TEL;TYPE=CELL:${p}`):[]),
+      d.email?`EMAIL:${d.email}`:"",
+      d.address?`ADR;TYPE=WORK:;;${d.address};;;;`:"",
+      d.website?`URL:${d.website}`:"",
+      `NOTE:${d.bio}`
+    ].filter(Boolean);
+    if(d.photo) L.push(`PHOTO;VALUE=URL:${d.photo}`);
+    L.push("END:VCARD");
+    return L.join("\r\n");
+  }
+
+  // 一键加到通讯录
+  $("saveBtn").addEventListener("click",()=>{
+    const vcf = buildVCard();
+    const blob = new Blob([vcf],{type:"text/vcard;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = CARD.name + ".vcf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    showToast("正在打开通讯录，请点「添加」");
+  });
+
+  // 复制微信号
+  $("copyWxBtn").addEventListener("click",()=>copyText(CARD.wechat,"微信号已复制"));
+
+  function copyText(t,msg){
+    if(!t){showToast("未设置");return;}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(()=>showToast(msg)).catch(()=>fallbackCopy(t,msg));
+    } else { fallbackCopy(t,msg); }
+  }
+  function fallbackCopy(t,msg){
+    const ta=document.createElement("textarea");
+    ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");showToast(msg);}catch(e){showToast("复制失败，请手动长按");}
+    ta.remove();
+  }
+  let toastTimer;
+  function showToast(m){
+    const t=$("toast");t.textContent=m;t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.classList.remove("show"),1800);
+  }
+})();
+</script>
+</body>
+</html>
