@@ -39,6 +39,8 @@
     box-shadow:0 8px 24px rgba(0,0,0,.12);
   }
   .wx-tip b{color:#92400e;}
+  .wx-tip-row{text-align:right;margin-top:10px;}
+  .wx-tip-row a{color:#1d4ed8;font-weight:700;text-decoration:none;font-size:13px;}
   .card{
     width:100%;max-width:380px;
     background:#fff;
@@ -129,7 +131,8 @@
 <body>
 
 <div class="wx-tip" id="wxTip">
-  💡 当前在微信中打开，<b>点击右上角 ⋯ → 选择「在浏览器打开」</b>，再点「一键加到通讯录」即可保存我的联系方式。
+  💡 当前在微信中打开，<b>点击右上角 ⋯ → 选择「在浏览器打开」</b>，再点「一键加到通讯录」即可保存。
+  <div class="wx-tip-row"><a href="javascript:;" id="copyLinkBtn">📋 复制页面链接，在浏览器打开</a></div>
 </div>
 
 <div class="card">
@@ -180,6 +183,8 @@ const CARD = {
 
   // 微信环境检测
   if(/MicroMessenger/i.test(navigator.userAgent)){ $("wxTip").style.display="block"; }
+  // 复制页面链接（主要用于微信内跳转浏览器）
+  $("copyLinkBtn").addEventListener("click",()=>copyText(location.href,"链接已复制，去浏览器粘贴打开"));
 
   // 头像
   const av = $("avatar");
@@ -259,7 +264,7 @@ const CARD = {
     a.click();
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
-    showToast("正在打开通讯录，请点「添加」");
+    showToast("已下载「王小建.vcf」，打开文件即可导入通讯录");
   });
 
   // 复制微信号
